@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/maintemplate.dwt" --><!-- DW6 -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!-- #BeginEditable "doctitle" --><title>Jep Documentation - Serialization</title><!-- #EndEditable --> 
+<link rel="stylesheet" type="text/css" href="main.css" title="style1" />
+</head>
+
+<body bgcolor="#ffffff">
+
+<!-- NAVIGATION ======================================================= -->
+<div id="navcontainer"> 
+  <ul>
+    <li><a href="../javadoc/index.html" target="_blank">JavaDoc <img src="img/new-window-icon.gif" alt="new window" width="15" height="11" /></a></li>
+  </ul>
+  <h1>Jep Java</h1>
+  <ul>
+    <li><a href="index.html">Introduction</a></li>
+    <li><a href="usage.html">Basic Usage</a></li>
+    <li><a href="variables.html">Variables</a></li>
+    <li><a href="types.html">Data Types</a></li>
+    <li><a href="operators.html">Operators</a></li>
+    <li><a href="functions.html">Functions</a></li>
+    <li><a href="customfunctions.html">Custom Functions</a></li>
+    <li><a href="bigdecimal.html">BigDecimal</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="migrate.html">Migration</a></li>
+    <li><a href="version.html">Version History</a></li>
+  </ul>
+  <h1>Advanced Features</h1>
+  <ul>
+    <li><a href="manipulating.html">Manipulating Expressions</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="confparser.html">Configurable Parser</a></li>
+    <li><a href="serialization.html">Serialization</a></li>
+    <li><a href="grammar.html">Grammar</a></li>
+  </ul>
+  
+    <!--  <h1>Extensions</h1>
+  <ul>
+    <li><a href="../html/extensions/index.html">Overview</a></li>
+    <li><a href="../html/extensions/xjep.html">XJep</a></li>
+    <li><a href="../html/extensions/djep.html">Differentiation</a></li>
+    <li><a href="../html/extensions/vectorjep.html">Vectors and Matrices</a></li>
+    <li><a href="../html/extensions/rpe.html">Fast Evaluation</a></li>
+    <li><a href="../html/extensions/groupjep.html">Groups</a></li>
+    <li><a href="../html/extensions/version.html">Version History</a></li>
+  </ul>-->
+  
+</div>
+
+<!-- CENTER CONTENT ================================================== -->
+<div id="centercontent">
+
+
+<!-- #BeginEditable "Text" --> 
+
+
+  <h1><a name="top" id="top"></a>Serialization and Threads</h1>
+	
+<p>
+Starting with Jep 3.1, parsed expressions, the main Jep class, and its sub-components are all serializable. This
+allows persistent storage and transfer between applications.
+Issues regarding threads and the use of multiple Jep instances are also discussed in this section.</p>
+
+<h2>What needs to be serialized?</h2>
+<p>
+Depending on your needs you may choose from three different serialization options:</p>
+<ul>
+<li><strong>Expressions only:</strong> If the source and destination have the same set up for Jep, with the same set of functions and operators
+the this form will take the minimum size.</li>
+<li><strong>VariableTable and expressions:</strong> this will also save the values of variables</li>
+<li><strong>Full serialization:</strong> serializes the Jep instance, together with its configuration and settings.</li>
+</ul>
+
+<h2>Serializing an expression</h2>
+<p>
+The Node class itself is not serializable. Instead, a wrapper class
+<a href="../javadoc/com/singularsys/jep/walkers/SerializableExpression.html">com.singularsys.jep.walkers.SerializableExpression</a>
+is used to provide a compact serializable representation of a node. The class is constructed
+using <code>new SerializedExpression(Node n)</code>
+and the <code>Node toNode(Jep j)</code> method is used to extract the node in the context
+of a given Jep instance.</p>
+<p>To serialize use:</p>
+<pre class="codebox">
+//  Set-up jep        
+Jep j = new Jep();
+
+// create an ObjectOutputStream
+ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+// parse an expression
+Node n = j.parse("1+cos(2 th)");
+
+// Create a SerializableExpression
+SerializableExpression se = new SerializableExpression(n);
+
+// write the SerializedExpression
+oos.writeObject(se);
+oos.close();
+
+// extract the bytes
+byte bytes[] = baos.toByteArray();
+</pre>
+<p>To deserialize the expression use:</p>
+<pre class="codebox">
+//  Set-up jep        
+Jep j2 = new Jep();
+
+// Create an ObjectInputStream from the set of bytes
+ByteArrayInputStream bais = new ByteArrayInputStream(bytes); 
+ObjectInputStream ois = new ObjectInputStream(bais);
+
+// Deserialize the SerializableExpression
+SerializableExpression se2 = (SerializableExpression) ois.readObject();
+
+// Create a node
+Node n2 = se2.toNode(j2);
+ois.close();
+</pre>
+<p>
+Alternatively, the serialized expression could be written to a file</p>
+<pre class="codebox">
+....
+File f = new File(....);
+FileOutputStream fos = new FileOutputStream(f);
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+// write objects 
+oos.writeObject(se);
+oos.close();
+</pre>
+
+<pre class="codebox">
+FileInputStream fis = new FileInputStream(f);
+ObjectInputStream ois = new ObjectInputStream(fis);
+
+// read objects
+SerializableExpression se2 = (SerializableExpression) ois.readObject();
+ois.close();
+</pre>
+
+<h3>Serializing the VariableTable and an expression</h3>
+<p>
+If you wish to serialize the values of variables for later use, then
+the VariableTable can be serialized. Again this methods assumes 
+the same version and configuration of the Jep instances.</p>
+<pre class="codebox">
+Jep j = new Jep();
+
+// Setup the ObjectOutputStream
+ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+// Serialize the VariableTable
+oos.writeObject(j.getVariableTable());
+
+// Serialize the expression
+Node n = j.parse("a+cos(2 th)");
+SerializableExpression se = new SerializableExpression(n);
+oos.writeObject(se);
+
+oos.close();
+byte bytes[] = baos.toByteArray();
+</pre>
+<p>
+To deserialize</p>
+<pre class="codebox">
+//  Set-up jep        
+Jep j2 = new Jep();
+
+// Create an ObjectInputStream 
+ByteArrayInputStream bais = new ByteArrayInputStream(bytes); 
+ObjectInputStream ois = new ObjectInputStream(bais);
+
+// Deserialize the SymbolTable
+VariableTable vt2 = (VariableTable) ois.readObject();
+
+// Set the SymbolTable as that used by the jep instance
+j2.setComponent(vt2);
+
+// Deserialize the expression
+SerializableExpression se2 = (SerializableExpression) ois.readObject();
+Node n2 = se2.toNode(j2);
+ois.close();
+</pre>
+
+<h3>Serializing the Jep instance</h3>
+<p>
+The Jep class and all its components are serializable, meaning that the configuration of the Jep instance can be stored. This includes the full set of variables,
+functions, operators, and various settings. If the ConfigurableParser is used, then its
+configuration is also stored. Note that changes made to the standard JavaCC parser are not recorded.</p>
+<p>A typical setup will take 7KB with the standard parser and 12KB with the configurable parser.</p>
+<pre class="codebox">
+Jep j = new Jep();
+
+// Setup the ObjectOutputStream
+ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+// Serialize the VariableTable
+oos.writeObject(j);
+
+// Serialize the expression
+Node n = j.parse("a+cos(2 th)");
+SerializableExpression se = new SerializableExpression(n);
+oos.writeObject(se);
+
+oos.close();
+byte bytes[] = baos.toByteArray();
+</pre>
+<p>
+To deserialize</p>
+<pre class="codebox">
+// Create an ObjectInputStream from the set of bytes
+ByteArrayInputStream bais = new ByteArrayInputStream(bytes); 
+ObjectInputStream ois = new ObjectInputStream(bais);
+
+// Deserialize the Jep instance 
+Jep j2 = (Jep) ois.readObject();
+
+// Deserialize the expression
+SerializableExpression se2 = (SerializableExpression) ois.readObject();
+Node n2 = se2.toNode(j2);
+ois.close();
+</pre>
+
+<h3>Importing equations</h3>
+<p>
+The SerializedExpression class can also be used to produce
+copies of a node without having to serialize and deserialize.</p>
+<pre class="codebox">
+// Create first instance
+Jep j = new Jep();
+
+// Parse equation using first instance
+Node n = j.parse("a+cos(2 th)");
+
+// Create a SerializableExpression
+SerializableExpression se = new SerializableExpression(n);
+
+// Create second instance
+Jep j2 = new Jep();
+
+// Import expression into second instance
+Node n2 = se.toNode(j2);
+</pre>
+
+<h3>Multiple threads</h3>
+<p>
+On a multi-processor machine you may wish to
+evaluate the same expression, or set of expressions, in multiple threads.
+Typically each thread will have its own Jep instance and its own
+copy of the expression.
+</p>
+<p>
+The following is a skeleton implementation:</p>
+<pre class="codebox">
+public class ThreadRunner {
+	class EvaluationThread extends Thread {
+		Jep myJep;
+		Node myNode;
+		double result;
+
+
+		EvaluationThread(SerializableExpression se, String varName, double value) throws Exception {
+			myJep = new Jep();
+			myNode = se.toNode(myJep);
+			myJep.addVariable(varName, value);
+		}
+
+
+		public void run() {
+		    try {
+			    Object res = myJep.evaluate(myNode);
+			    result = ((Double) res);
+		    } catch (EvaluationException e) {
+				System.out.println(e.getMessage());
+		    }
+		}
+	}
+	
+	// Setup and run multiple threads using the same expression
+	go(String expression, int nThreads) throws Exception {
+		Jep baseJep = new Jep();
+		Node baseNode = baseJep.parse(expression);
+		// Create a SerializableExpression
+		SerializableExpression se = new SerializableExpression(baseNode);
+		
+		// create and run a number of threads each with a different value for x
+		EvaluationThread threads[] = new EvaluationThread[nThreads];
+		for(int i=0; i&lt;nThreads; ++i) {
+			threads[i] = new EvaluationThread(se,"x",Math.Pi * i/ nThreads);
+			threads[i].start();
+		}
+	    // wait for all threads to finish and print results
+	    for(int i=0; i&lt;nThreads; ++i) {
+		    try {
+				threads[i].join();
+		    } catch (InterruptedException e) {
+		    }
+		    System.out.println("Thread "+i+" result "+threads[i].result);
+		}
+	}
+}	    
+</pre>
+
+<p>
+In practice the code will be more complex than this, the expression
+may be evaluated multiple times, and more than one variable will be used.
+You may wish to move the initialization of the Jep instance and extraction of nodes
+into the run method. </p>
+<h3>Light-weight Jep instances</h3>
+<p>
+Creation of new Jep instances can have a considerable memory footprint,
+a Jep instance with a StandardParser takes about 56kB bytes for
+a Jep instance with a configurable parser takes about 14kB bytes.
+Its possible to create a light-weight Jep instance which reuses
+components from an existing Jep instance, such instances only take 1kB.
+</p>
+<p>
+Light-weight instances have no parsing facility,
+and their own copies of the VariableTable and Evaluator so are safe to
+uses in multiple threads.
+</p>
+<pre class="codebox">
+Jep j = new Jep();
+ComponentSet cs = new LightWeightComponentSet(j);
+Jep lwj = new Jep(cs); 
+</pre>
+<p>
+Note that the new instance will share the FunctionTable and its associated
+PostfixMathCommands. See the 
+LightWeightComponentSet 
+<a href="../javadoc/com/singularsys/jep/misc/LightWeightComponentSet.html">LightWeightComponentSet</a>
+documentation for issues which mary arise and workarounds.
+The above code will create copies of all variables. The <code>public LightWeightComponentSet(Jep jep,boolean copyConstants)</code> constructor
+can be used to just copy constants or leave the table empty. 
+
+</p>
+  <!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><!-- #EndEditable -->
+
+
+
+
+<!-- FOOTER ========================================================== -->
+  <div id="footer"> <a href="http://www.singularsys.com/jep/dist-bugreport.php">Report 
+    bugs / documentation errors</a><br/>
+<br/>
+    &copy; 2010 <a href="http://www.singularsys.com" target="_blank">Singular 
+    Systems</a> </div>
+</div> <!-- centercontent -->
+
+</body>
+<!-- #EndTemplate --></html>

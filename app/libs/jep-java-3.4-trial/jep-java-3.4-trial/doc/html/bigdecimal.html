@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/maintemplate.dwt" --><!-- DW6 -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!-- #BeginEditable "doctitle" --> 
+<title>Jep Documentation - BigDecimal Mode</title>
+<!-- #EndEditable --> 
+<link rel="stylesheet" type="text/css" href="main.css" title="style1" />
+</head>
+
+<body bgcolor="#ffffff">
+
+<!-- NAVIGATION ======================================================= -->
+<div id="navcontainer"> 
+  <ul>
+    <li><a href="../javadoc/index.html" target="_blank">JavaDoc <img src="img/new-window-icon.gif" alt="new window" width="15" height="11" /></a></li>
+  </ul>
+  <h1>Jep Java</h1>
+  <ul>
+    <li><a href="index.html">Introduction</a></li>
+    <li><a href="usage.html">Basic Usage</a></li>
+    <li><a href="variables.html">Variables</a></li>
+    <li><a href="types.html">Data Types</a></li>
+    <li><a href="operators.html">Operators</a></li>
+    <li><a href="functions.html">Functions</a></li>
+    <li><a href="customfunctions.html">Custom Functions</a></li>
+    <li><a href="bigdecimal.html">BigDecimal</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="migrate.html">Migration</a></li>
+    <li><a href="version.html">Version History</a></li>
+  </ul>
+  <h1>Advanced Features</h1>
+  <ul>
+    <li><a href="manipulating.html">Manipulating Expressions</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="confparser.html">Configurable Parser</a></li>
+    <li><a href="serialization.html">Serialization</a></li>
+    <li><a href="grammar.html">Grammar</a></li>
+  </ul>
+  
+    <!--  <h1>Extensions</h1>
+  <ul>
+    <li><a href="../html/extensions/index.html">Overview</a></li>
+    <li><a href="../html/extensions/xjep.html">XJep</a></li>
+    <li><a href="../html/extensions/djep.html">Differentiation</a></li>
+    <li><a href="../html/extensions/vectorjep.html">Vectors and Matrices</a></li>
+    <li><a href="../html/extensions/rpe.html">Fast Evaluation</a></li>
+    <li><a href="../html/extensions/groupjep.html">Groups</a></li>
+    <li><a href="../html/extensions/version.html">Version History</a></li>
+  </ul>-->
+  
+</div>
+
+<!-- CENTER CONTENT ================================================== -->
+<div id="centercontent">
+
+
+<!-- #BeginEditable "Text" --> 
+  <h1><a name="top" id="top"></a>BigDecimal Mode</h1>
+  <p>With Jep 3, it is now possible to evaluate expressions using decimal arithmetic. 
+    This allows calculations to be performed with specified accuracy or even unlimited 
+    accuracy. If you are running into precision problems or already know that 
+    you will require the highest possible precision in your calculations, we recommend 
+    using this operation mode.</p>
+  <p>Rather than using the <code>double</code> type to represent numbers, <code>BigDecimal</code> 
+    is used. The <code>BigDecimal</code> class is part of the Java API and is 
+    contained in the <code>java.math</code> package. For more information on this 
+    class, please read the <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/math/BigDecimal.html" target="_blank">Sun 
+    Javadocs for BigDecimal</a>.</p>
+  <p>The difference in the accuracy is best shown through an example. When performing 
+    multiplication of two numbers of the <code>double</code> type,</p>
+  <p>&nbsp;&nbsp;&nbsp; 10*0.09 evaluates as <b>0.8999999999999999</b>.</p>
+  <p>But when performing the same calculation using decimal arithmetic with the 
+    <code>BigDecimal</code> type,</p>
+  <p>&nbsp;&nbsp;&nbsp;10*0.09 evaluates as <b>0.9</b>.</p>
+  <!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><h2><a name="howto" id="howto"></a>How to use BigDecimal mode</h2>
+    
+  <p>Using Jep in BigDecimal mode is simple. Simply create a new Jep instance using the
+  <a href="../javadoc/com/singularsys/jep/bigdecimal/BigDecComponents.html">BigDecComponents</a> with:</p>
+  <pre class="codebox">
+import com.singularsys.jep.bigDecimals.BigDecComponents;
+
+...
+
+jep = new Jep(new BigDecComponents());</pre>
+  <p>This initializes Jep with a special the BigDecNumberFactory, BigDecOperatorTable 
+    and BigDecFunctionTable. By default, the math context is set to unlimited precision. 
+    But you can also initialize the components with a different math context. 
+    For example, to use 32-bit precision numbers simply use</p>
+  <pre class="codebox">
+jep = new Jep(new BigDecComponents(MathContext.DECIMAL32));</pre>
+  <p>For more information about MathContexts refer to the <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/math/MathContext.html">Sun 
+    MathContext Javadocs</a>.</p>
+    <!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><h2><a name="operators" id="operators"></a>Supported Operators and Functions</h2>
+    
+  <p>Guaranteeing precision unfortunately comes at the cost of more complex algorithms 
+    for basic operators and functions. For this reason, some of the functions 
+    and operators available for <code>double</code> arithmetic are not available 
+    in the BigDecimal mode.</p>
+  <p>The supported operators and functions are as follows:</p>
+  <p>+, -, *, /, ^ (power), % (modulus)</p>
+  <p>&gt;, &lt;, &gt;=, &lt;=, == (equals)</p>
+  <p>&amp;&amp; (and), || (or), ! (not)</p>
+  <p>Just like with Jep in standard mode, you can add your own custom functions.</p>
+
+    <!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><h2><a name="operators" id="operators"></a>BigDecimal and Strings</h2>
+
+        <p>By default BigDecimal and Strings cannot be used together but as of release 3.4 this can now be turned on.
+        The following code switches on this facility and adds the standard string functions.</p>
+
+  <pre class="codebox">
+        // Create the BigDecComponents
+        BigDecComponents compSet = new BigDecComponents(MathContext.DECIMAL64,true);
+        // Create a jep instance
+        jep = new Jep(compSet);
+        // Add the standard set of string functions
+        jep.setComponent(new StringFunctionSet());
+        </pre>
+        
+        <p>
+        The above code will allow strings to be concatenated using '+' 
+        and compared using '==', '!=', '<', '<=', '>=', '>'.
+        The <a href="../javadoc/com/singularsys/jep/functions/strings/StringFunctionSet.html">StringFunctionSet</a> allows the
+        left, right, lower, upper, substring, len, mid, trim.
+        </p>
+  <!-- #EndEditable -->
+
+
+
+
+<!-- FOOTER ========================================================== -->
+  <div id="footer"> <a href="http://www.singularsys.com/jep/dist-bugreport.php">Report 
+    bugs / documentation errors</a><br/>
+<br/>
+    &copy; 2010 <a href="http://www.singularsys.com" target="_blank">Singular 
+    Systems</a> </div>
+</div> <!-- centercontent -->
+
+</body>
+<!-- #EndTemplate --></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/maintemplate.dwt" --><!-- DW6 -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!-- #BeginEditable "doctitle" -->
+<title>Fast evaluation of mathematical equations in Java - JEP extensions</title>
+<!-- #EndEditable --> 
+<link rel="stylesheet" type="text/css" href="../main.css" title="style1" />
+</head>
+
+<body bgcolor="#ffffff">
+
+<!-- NAVIGATION ======================================================= -->
+<div id="navcontainer"> 
+  <ul>
+    <li><a href="../../javadoc/index.html" target="_blank">JavaDoc <img src="../img/new-window-icon.gif" alt="new window" width="15" height="11" /></a></li>
+  </ul>
+  <h1>Jep Java</h1>
+  <ul>
+    <li><a href="../index.html">Introduction</a></li>
+    <li><a href="../usage.html">Basic Usage</a></li>
+    <li><a href="../variables.html">Variables</a></li>
+    <li><a href="../types.html">Data Types</a></li>
+    <li><a href="../operators.html">Operators</a></li>
+    <li><a href="../functions.html">Functions</a></li>
+    <li><a href="../customfunctions.html">Custom Functions</a></li>
+    <li><a href="../bigdecimal.html">BigDecimal</a></li>
+    <li><a href="../faq.html">FAQ</a></li>
+    <li><a href="../migrate.html">Migration</a></li>
+    <li><a href="../version.html">Version History</a></li>
+  </ul>
+  <h1>Advanced Features</h1>
+  <ul>
+    <li><a href="../manipulating.html">Manipulating Expressions</a></li>
+    <li><a href="../components.html">Components</a></li>
+    <li><a href="../confparser.html">Configurable Parser</a></li>
+    <li><a href="../serialization.html">Serialization</a></li>
+    <li><a href="../grammar.html">Grammar</a></li>
+  </ul>
+  
+    <!--  <h1>Extensions</h1>
+  <ul>
+    <li><a href="../html/extensions/index.html">Overview</a></li>
+    <li><a href="../html/extensions/xjep.html">XJep</a></li>
+    <li><a href="../html/extensions/djep.html">Differentiation</a></li>
+    <li><a href="../html/extensions/vectorjep.html">Vectors and Matrices</a></li>
+    <li><a href="../html/extensions/rpe.html">Fast Evaluation</a></li>
+    <li><a href="../html/extensions/groupjep.html">Groups</a></li>
+    <li><a href="../html/extensions/version.html">Version History</a></li>
+  </ul>-->
+  
+</div>
+
+<!-- CENTER CONTENT ================================================== -->
+<div id="centercontent">
+
+
+<!-- #BeginEditable "Text" --> 
+  <h1><a name="top" id="top"></a>Fast evaluation of mathematical equations in Java - extensions to Jep</h1>
+  <p><br />
+    The <a href="../../javadoc/org/lsmp/djep/rpe/package-summary.html">org.lsmp.djep.rpe</a> 
+    and <a href="../../javadoc/org/lsmp/djep/mrpe/package-summary.html">org.lsmp.djep.mrpe</a> 
+    packages offers fast evaluation routines for expressions involving scalars or matrices respectively. 
+  These offer a 5-10 times speed improvement over the standard Jep evaluation and approach the speed obtainable by native java code.</p>
+
+  <!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="../img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><h2>Scaler expressions</h2>
+  <p>
+  To optimise the speed of evaluation, separate packages are provided for equations involving doubles, i.e. standard single valued functions and those involving vectors and matrices. The <tt>org.lsmp.djep.rpe</tt> package provides support for non vector equations. 
+  </p>
+  <p>To use do  </p>
+  <pre class="codebox">
+  JEP j = new XJep();
+  j.addStandardConstants();
+  j.addStandardFunctions();
+  j.addComplex();
+  j.setAllowUndeclared(true);
+  j.setImplicitMul(true);
+  j.setAllowAssignment(true);
+
+  RpEval rpe = new RpEval(j);
+  
+  Node node = j.parse(&quot;cos(pi/3)^2&quot;); 
+  RpCommandList list = rpe.compile(node);
+  double val = rpe.evaluate(list);
+  System.out.println(val);
+  rpe.cleanUp();
+</pre>
+ 
+<h3>Variable</h3> 
+<p>
+Variable values in the evaluator are stored in a array. The array index of a variable can be found using</p>
+<pre class="codebox">
+  Variable v = j.getVar(&quot;x&quot;);
+  int ref = rpe.getVarRef(v);
+</pre>
+and the value of the variable set using
+<pre class="codebox">
+  rpe.setVarValue(ref,0.1234);
+</pre>
+<p>
+Variable values can also be set using the standard <tt>Variable.setValue()</tt> or (slower) <tt>JEP.setVarVal(name,vlaue)</tt> methods.
+Setting the value of a jep variable will automatically update the corresponding rpe value but there will be a performance hit. 
+Setting the value of the rpe variable does not change the value of the corresponding jep value.
+</p>
+<h3>How it works</h3>
+<p>
+The compile methods converts the expression represented by node
+into a string of commands. For example the expression &quot;4+5*6&quot; will
+be converted into the sequence of commands
+</p>
+<pre class="codebox">
+  Constant no 1 (4) (pushes constant onto stack)
+  Constant no 2 (5)
+  Constant no 3 (6)
+  Multiply scalers (multiplies last two entries on stack)
+  -  (6*5), the result (30) is pushed onto the top of the stack
+  Add scalers (adds last two entries on stack)
+  -  (30+4) the result (34) is pushed onto top of the stack
+</pre>
+<p>
+The evaluate method executes these methods sequentially
+using a stack 
+and returns the last object on the stack. 
+</p>
+<h3>Implementation notes</h3>
+<p>
+A few cautionary notes:
+Its very unlikely to be thread safe. It only works over doubles,
+expressions with complex numbers or strings will cause problems.
+It only works for expressions involving scalers.</p>
+<p>
+A lot of things have been done to make it as fast as possible:
+</p>
+<ul>
+<li>Everything is final which maximise the possibility for in-lining.</li>
+<li>All object creation happens during compile.</li>
+<li>All calculations done using double values.</li>
+<li>Each operator/function is hand coded. To extend functionality you will have to modify the source.</li>
+</ul>
+
+<h3>Example applications</h3>
+<ul>
+<li><a href="../../javadoc/org/lsmp/djepExamples/RpSpeed.html">org.lsmp.djepExamples.RpSpeed</a> runs some speed test applications.</li>
+<li><a href="../../javadoc/org/lsmp/djepExamples/RpeConsole.html">org.lsmp.djepExamples.RpeConsole</a> an interactive console application.</li>
+</ul>
+
+<h3>Supported functions</h3>
+<p>
+Functions which take double arguments and return double results are supported. Other functions which return strings or complex numbers will raise exceptions when used. 
+</p>
+<p>
+Some functions have been optimised for speed these are:
+<tt>sin, cos, tan, sec, cosec, cot, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, 
+abs, exp, log, ln, sqrt, atan2, if</tt> these are hand coded in the routines for high performance.
+</p>
+<p>
+Other jep functions which take double arguments and return double results are also supported. 
+These can be used directly and no additional calls are required.
+</p>
+<p>
+To improve performance four interfaces 
+<a href="../../javadoc/org/lsmp/djep/rpe/RealNullarFunction.html">org.lsmp.djep.RealNullaryFunction</a> (0 arguments)
+<a href="../../javadoc/org/lsmp/djep/rpe/RealUnaryFunction.html">org.lsmp.djep.RealUnaryFunction</a> (1 argument)
+<a href="../../javadoc/org/lsmp/djep/rpe/RealBinaryFunction.html">org.lsmp.djep.RealBinaryFunction</a> (2 arguments)
+<a href="../../javadoc/org/lsmp/djep/rpe/RealNaryFunction.html">org.lsmp.djep.RealNaryFunction</a> (any number of arguments)
+have been created, a PostfixMathCommand which implements one of these interfaces will be faster to evaluate.</p>
+<h3>Performance</h3>
+The table below indicates the evaluation speeds. Times are in milliseconds for a million evaluations.
+<table border="1" class="speedtable">
+<tr><th>Expression</th><th>Speed using Jep</th><th>Speed using rpe</th><th>Speed using Java</th></tr>
+<tr><td>5</td><td>156</td><td>47</td></tr>
+<tr><td>x</td><td>297</td><td>78</td></tr>
+<tr><td>1+x</td><td>781</td><td>94</td></tr>
+<tr><td>x^2</td><td>844</td><td>109</td></tr>
+<tr><td>x*x</td><td>781</td><td>94</td></tr>
+<tr><td>5*x</td><td>797</td><td>94</td></tr>
+<tr><td>cos(x)</td><td>656</td><td>156</td><td>79</td></tr>
+<tr><td>1+x+x^2</td><td>1828</td><td>172</td></tr>
+<tr><td>1+x+x^2+x^3</td><td>2844</td><td>281</td></tr>
+<tr><td>1+x+x^2+x^3+x^4</td><td>3891</td><td>312</td></tr>
+<tr><td>1+x+x^2+x^3+x^4+x^5</td><td>4891</td><td>375</td></tr>
+<tr><td>1+x(1+x(1+x(1+x(1+x))))</td><td>4766</td><td>391</td><td>62</td></tr>
+<tr><td>if(x&gt;0.5,1,0)</td><td>1219</td><td>219</td></tr>
+</table>
+This indicates a speed up of between 3 and 13 times as fast.<!-- #BeginLibraryItem "/Library/top bar.lbi" -->
+<div class="topbar"><a href="#top"><img src="../img/top.gif" alt="top" name="top" width="38" height="15"/></a></div>
+<!-- #EndLibraryItem --><!-- #EndEditable -->
+
+
+
+
+<!-- FOOTER ========================================================== -->
+  <div id="footer"> <a href="http://www.singularsys.com/jep/dist-bugreport.php">Report 
+    bugs / documentation errors</a><br/>
+<br/>
+    &copy; 2010 <a href="http://www.singularsys.com" target="_blank">Singular 
+    Systems</a> </div>
+</div> <!-- centercontent -->
+
+</body>
+<!-- #EndTemplate --></html>
