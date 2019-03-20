@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     Button multiply;
     Button divide;
     TextView expression;
+    int cardCount = 0;
 
     ImageButton[] cards;
 
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             expression.append(num);
             imageCount[i] ++;
         }
+        cardCount ++;
     }
 
     private boolean checkInput(String input) {
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                             cards[i].setImageResource(resID);
             cards[i].setClickable(true);
         }
+        cardCount = 0;
     }
 
 
@@ -124,16 +127,16 @@ public class MainActivity extends AppCompatActivity {
         cards[2] = (ImageButton) findViewById(R.id.card3);
         cards[3] = (ImageButton) findViewById(R.id.card4);
 
-        rePick = (Button)findViewById(R.id.repick);
-        checkInput = (Button)findViewById(R.id.checkinput);
-        left = (Button)findViewById(R.id.left);
-        right = (Button)findViewById(R.id.right);
-        plus = (Button)findViewById(R.id.plus);
-        minus = (Button)findViewById(R.id.minus);
-        multiply = (Button)findViewById(R.id.multiply);
-        divide = (Button)findViewById(R.id.divide);
-        clear = (Button)findViewById(R.id.clear);
-        expression = (TextView)findViewById(R.id.input);
+        rePick = (Button) findViewById(R.id.repick);
+        checkInput = (Button) findViewById(R.id.checkinput);
+        left = (Button) findViewById(R.id.left);
+        right = (Button) findViewById(R.id.right);
+        plus = (Button) findViewById(R.id.plus);
+        minus = (Button) findViewById(R.id.minus);
+        multiply = (Button) findViewById(R.id.multiply);
+        divide = (Button) findViewById(R.id.divide);
+        clear = (Button) findViewById(R.id.clear);
+        expression = (TextView) findViewById(R.id.input);
 
         pickCard();
 
@@ -158,54 +161,56 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        left.setOnClickListener(new Button.OnClickListener(){
+        left.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append("(");
             }
         });
-        right.setOnClickListener(new Button.OnClickListener(){
+        right.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append(")");
             }
         });
-        plus.setOnClickListener(new Button.OnClickListener(){
+        plus.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append("+");
             }
         });
-        minus.setOnClickListener(new Button.OnClickListener(){
+        minus.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append("-");
             }
         });
-        multiply.setOnClickListener(new Button.OnClickListener(){
+        multiply.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append("*");
             }
         });
-        divide.setOnClickListener(new Button.OnClickListener(){
+        divide.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 expression.append("/");
             }
         });
 
-        clear.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View view){
+        clear.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View view) {
                 setClear();
             }
         });
 
-        checkInput.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View view){
-               String inputStr = expression.getText().toString();
-               if(checkInput(inputStr)){
-                   Toast.makeText(MainActivity.this, "Correct Answer", Toast.LENGTH_SHORT).show();
-                   pickCard();
-               }else{
-                   Toast.makeText(MainActivity.this, "Wrong Answer", Toast.LENGTH_SHORT).show();
-                   setClear();
-               }
-            }
-        });
+        if (cardCount == 4) {
+            checkInput.setOnClickListener(new Button.OnClickListener() {
+                public void onClick(View view) {
+                    String inputStr = expression.getText().toString();
+                    if (checkInput(inputStr)) {
+                        Toast.makeText(MainActivity.this, "Correct Answer", Toast.LENGTH_SHORT).show();
+                        pickCard();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Wrong Answer", Toast.LENGTH_SHORT).show();
+                        setClear();
+                    }
+                }
+            });
+        }
     }
 }
