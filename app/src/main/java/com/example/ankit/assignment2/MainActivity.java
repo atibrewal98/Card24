@@ -27,9 +27,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    int[] data;
+    int[] card;
+    private void pickCard(){
+        data = new int[4];
+        card = new int[4];
+        card[0]=4;
+        card[1]=5;
+        card[2]=9;
+        card[3]=10;
+        data[0]=4;
+        data[1]=5;
+        data[2]=9;
+        data[3]=10;
+        setClear();
+    }
+
+    int[] imageCount;
+    private void setClear(){
+        int resID;
+        imageCount = new int[4];
+        expression.setText("");
+        for (int i = 0; i < 4; i++) {
+            imageCount[i] = 0;
+            resID = getResources().getIdentifier
+                    ("card"+card[i],"drawable", "com.example.ankit.assignment2");
+                            cards[i].setImageResource(resID);
+            cards[i].setClickable(true);
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         cards = new ImageButton[4];
         cards[0] = (ImageButton) findViewById(R.id.card1);
         cards[1] = (ImageButton) findViewById(R.id.card2);
@@ -45,6 +77,6 @@ public class MainActivity extends AppCompatActivity {
         divide = (Button)findViewById(R.id.divide);
         clear = (Button)findViewById(R.id.clear);
         expression = (TextView)findViewById(R.id.input);
-        setContentView(R.layout.activity_main);
+        pickCard();
     }
 }
