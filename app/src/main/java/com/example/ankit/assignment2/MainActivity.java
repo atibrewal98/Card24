@@ -142,53 +142,88 @@ public class MainActivity extends AppCompatActivity {
 
         cards[0].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
-                clickCard(0);
+                String str = expression.getText().toString();
+                if(str == "" || str.charAt(str.length()-1) == '('
+                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                    clickCard(0);
             }
         });
         cards[1].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
-                clickCard(1);
+                String str = expression.getText().toString();
+                if(str == "" || str.charAt(str.length()-1) == '('
+                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                    clickCard(1);
             }
         });
         cards[2].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
-                clickCard(2);
+                String str = expression.getText().toString();
+                if(str == "" || str.charAt(str.length()-1) == '('
+                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                    clickCard(2);
             }
         });
         cards[3].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
-                clickCard(3);
+                String str = expression.getText().toString();
+                if(str == "" || str.charAt(str.length()-1) == '('
+                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                    clickCard(3);
             }
         });
 
         left.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append("(");
+                String str = expression.getText().toString();
+                if(str == "" || str.charAt(str.length()-1) == '('
+                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                    expression.append("(");
             }
         });
         right.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append(")");
+                String str = expression.getText().toString();
+                if(str.length() != 0 && (str.charAt(str.length()-1) == ')'
+                        || ((int)str.charAt(str.length()-1) >= 48 && (int)str.charAt(str.length()-1) <= 57)))
+                    expression.append(")");
             }
         });
         plus.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append("+");
+                String str = expression.getText().toString();
+                if(str.length() != 0 && (str.charAt(str.length()-1) == ')'
+                        || ((int)str.charAt(str.length()-1) >= 48 && (int)str.charAt(str.length()-1) <= 57)))
+                    expression.append("+");
             }
         });
         minus.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append("-");
+                String str = expression.getText().toString();
+                if(str.length() != 0 && (str.charAt(str.length()-1) == ')'
+                        || ((int)str.charAt(str.length()-1) >= 48 && (int)str.charAt(str.length()-1) <= 57)))
+                    expression.append("-");
             }
         });
         multiply.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append("*");
+                String str = expression.getText().toString();
+                if(str.length() != 0 && (str.charAt(str.length()-1) == ')'
+                        || ((int)str.charAt(str.length()-1) >= 48 && (int)str.charAt(str.length()-1) <= 57)))
+                    expression.append("*");
             }
         });
         divide.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
-                expression.append("/");
+                String str = expression.getText().toString();
+                if(str.length() != 0 && (str.charAt(str.length()-1) == ')'
+                        || ((int)str.charAt(str.length()-1) >= 48 && (int)str.charAt(str.length()-1) <= 57)))
+                    expression.append("/");
             }
         });
 
