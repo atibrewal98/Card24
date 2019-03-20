@@ -198,9 +198,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (cardCount == 4) {
-            checkInput.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View view) {
+        checkInput.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View view) {
+                if(cardCount == 4) {
                     String inputStr = expression.getText().toString();
                     if (checkInput(inputStr)) {
                         Toast.makeText(MainActivity.this, "Correct Answer", Toast.LENGTH_SHORT).show();
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                         setClear();
                     }
                 }
-            });
-        }
+            }
+        });
     }
 }
