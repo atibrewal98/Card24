@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
         data[1]=random2 % 13;
         data[2]=random3 % 13;
         data[3]=random4 % 13;
+        /*Set the value of K to be 13*/
+        for(int i = 0; i < 4; i++){
+            if(data[i] == 0)
+                data[i] += 13;
+        }
         setClear();
     }
 
