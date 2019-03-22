@@ -149,16 +149,20 @@ public class DisplayGame extends AppCompatActivity {
         cards[0].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
                 String str = expression.getText().toString();
-                if(str == "" || str.charAt(str.length()-1) == '('
-                        || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
-                        || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
+                if(str.length() == 0)
+                    clickCard(0);
+                else if(str.charAt(str.length()-1) == '('
+                    || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
+                    || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
                     clickCard(0);
             }
         });
         cards[1].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
                 String str = expression.getText().toString();
-                if(str == "" || str.charAt(str.length()-1) == '('
+                if(str.length() == 0)
+                    clickCard(1);
+                else if(str.charAt(str.length()-1) == '('
                         || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
                         || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
                     clickCard(1);
@@ -167,7 +171,9 @@ public class DisplayGame extends AppCompatActivity {
         cards[2].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
                 String str = expression.getText().toString();
-                if(str == "" || str.charAt(str.length()-1) == '('
+                if(str.length() == 0)
+                    clickCard(2);
+                else if(str.charAt(str.length()-1) == '('
                         || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
                         || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
                     clickCard(2);
@@ -176,7 +182,9 @@ public class DisplayGame extends AppCompatActivity {
         cards[3].setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View view) {
                 String str = expression.getText().toString();
-                if(str == "" || str.charAt(str.length()-1) == '('
+                if(str.length() == 0)
+                    clickCard(3);
+                else if(str.charAt(str.length()-1) == '('
                         || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
                         || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
                     clickCard(3);
@@ -186,7 +194,9 @@ public class DisplayGame extends AppCompatActivity {
         left.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View view) {
                 String str = expression.getText().toString();
-                if(str == "" || str.charAt(str.length()-1) == '('
+                if(str.length() == 0)
+                    expression.append("(");
+                else if(str.charAt(str.length()-1) == '('
                         || str.charAt(str.length()-1) == '+' || str.charAt(str.length()-1) == '-'
                         || str.charAt(str.length()-1) == '*' || str.charAt(str.length()-1) == '/')
                     expression.append("(");
